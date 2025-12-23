@@ -23,7 +23,7 @@
     <ProjectGuid>{fc60cb8d-288f-46ad-9fc6-da666638be22}</ProjectGuid>
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <Keyword>ManagedCProj</Keyword>
-    <RootNamespace>SingleLayerNetwork</RootNamespace>
+    <RootNamespace>MultiLayerNetwork</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />

@@ -54,34 +54,25 @@ namespace CppCLRWinFormsProject {
 		   array<Color>^ classColors;
 		   Random^ random;
 
-		   int inputSize; //Giriþ Vektörü Boyut 
-		   int hiddenSize; //Kaç Tane Gizli Katman Nöronu Olacak
-		   int numClasses; //Kaç Tane Sýnýf Olacak Sorusunun Cevabý
+		   int inputSize;
+		   int hiddenSize;
+		   int numClasses;
 
-		   array<float, 2>^ weights_IH; // weights_IH[0, 0]	weights_IH[0, 1] Ara Katman Nöron Sayýsý Kadar Satýr Olacak
-										// weights_IH[1, 0]	weights_IH[1, 1]
-										// weights_IH[2, 0]	weights_IH[2, 1]
-		  
-		   array<float>^ biases_H;      // biases_H[0] biases_H[1] biases_H[2] ... Hidden Size Kadar
-
-		   array<float, 2>^ weights_HO; // weights_HO[0, 0]	weights_HO[0, 1] weights_HO[0, 2] Ara Katman Nöron Sayýsý Kadar Sütun Olacak
-										// weights_HO[1, 0]	weights_HO[1, 1] weights_HO[1, 2]
-										// weights_HO[2, 0]	weights_HO[2, 1] weights_HO[2, 2]
-		  
-
-		   array<float>^ biases_O;		// biases_O[0] biases_O[1] biases_O[2] Sýnýf Sayýsý Kadar
-
+		   array<float, 2>^ weights_IH;
+		   array<float>^ biases_H;
+		   array<float, 2>^ weights_HO;
+		   array<float>^ biases_O;
 
 		   array<float, 2>^ velocity_weights_IH;
 		   array<float>^ velocity_biases_H;
 		   array<float, 2>^ velocity_weights_HO;
 		   array<float>^ velocity_biases_O;
 
-		   float learningRate; //Öðrenme Sabiti
+		   float learningRate;
 		   float momentumFactor;
 		   int epochs;
 
-		   Bitmap^ backgroundBitmap; //Arkaplandaki Bitleri Tutan Veri Yapýsý
+		   Bitmap^ backgroundBitmap;
 
 		   bool IsDesignMode()
 		   {
@@ -229,10 +220,8 @@ namespace CppCLRWinFormsProject {
 
 	private: System::Void Form2_Load(System::Object^ sender, System::EventArgs^ e) {
 		if (IsDesignMode()) return;
-		classColors = gcnew array<Color>{ Color::Red, Color::Blue, Color::Green, Color::Orange, Color::Purple }; //Sýnýflara Ait Renkler, \
-		En Fazla 5 Sýnýf Olacak Þekilde Ayarlanmýþ
-
-		classes = gcnew List<ClassData^>(); 
+		classColors = gcnew array<Color>{ Color::Red, Color::Blue, Color::Green, Color::Orange, Color::Purple };
+		classes = gcnew List<ClassData^>();
 		random = gcnew Random();
 
 		inputSize = 2;
@@ -244,8 +233,7 @@ namespace CppCLRWinFormsProject {
 		InitializeClasses((int)numericUpDown1->Value);
 	}
 
-	private: void InitializeNetworkParameters() {  //Bu fonksiyonda baþlangýç aðýrlýklarý rastgele þekilde atanýyor, momentum aðýrlýklarý atanýyor. \
-		Arkaplan ve Grafik Sýfýrlanýyor. Aðý sýfýrla komutu bu fonksiyonu çalýþtýrýyor
+	private: void InitializeNetworkParameters() {
 		if (IsDesignMode()) return;
 		numClasses = classes->Count;
 
@@ -281,12 +269,11 @@ namespace CppCLRWinFormsProject {
 			chartLoss->Series["Error"]->Points->Clear(); // Grafiði sil
 	}
 
-	private: void InitializeClasses(int count) { //
+	private: void InitializeClasses(int count) {
 		if (IsDesignMode()) return;
 		classes->Clear();
 		listBox1->Items->Clear();
-		int maxCount = Math::Min(count, classColors->Length); //Sýnýf sayýsý renkleri tutan listeden büyükse, sýnýf sayýsý 5 olsun, aksi takdirde \
-		ayarladýðýmýz sayý olsun
+		int maxCount = Math::Min(count, classColors->Length);
 		for (int i = 0; i < maxCount; i++) {
 			ClassData^ cls = gcnew ClassData(i, "Sýnýf " + (i + 1), classColors[i]);
 			classes->Add(cls);
@@ -344,7 +331,8 @@ namespace CppCLRWinFormsProject {
 	}
 
 	private: System::Void resetNetworkToolStripMenuItem_Click(System::Object^ sender, System::EventArgs^ e) {
-		InitializeNetworkParameters(); // Bu metod sadece aðýrlýklarý/biaslarý sýfýrlar ve grafiði temizler.
+		// Bu metod sadece aðýrlýklarý/biaslarý sýfýrlar ve grafiði temizler.
+		InitializeNetworkParameters();
 		pictureBox1->Invalidate();
 		labelEpoch->Text = "Að Sýfýrlandý. Eðitime Hazýr.";
 	}
@@ -384,7 +372,7 @@ namespace CppCLRWinFormsProject {
 		float cy = pictureBox1->Height / 2.0f;
 		for each(ClassData ^ cls in classes) {
 			for each(Point p in cls->Points)
-				data->Add(gcnew PointData(cls->Id, 0, (p.X - cx) / cx, (cy - p.Y) / cy)); //Noktalarý merkezi (0, 0) olacak þekilde ayarlýyoruz.
+				data->Add(gcnew PointData(cls->Id, 0, (p.X - cx) / cx, (cy - p.Y) / cy));
 		}
 		if (data->Count == 0) return;
 
@@ -394,13 +382,13 @@ namespace CppCLRWinFormsProject {
 		for (int epoch = 0; epoch < epochs; epoch++) {
 			float totalLoss = 0.0f;
 
-			for (int i = 0; i < data->Count; i++) {  // Daha iyi bir eðitim için her döngüde noktalarý daðýtýyoruz.
+			for (int i = 0; i < data->Count; i++) {
 				int r = random->Next(i, data->Count);
 				PointData^ tmp = data[i]; data[i] = data[r]; data[r] = tmp;
 			}
 
 			for each(PointData ^ p in data) {
-				auto res = ForwardPass(p->X, p->Y); //Noktalar bu kýsýmda forwardPass yapýlýyor
+				auto res = ForwardPass(p->X, p->Y);
 				array<float>^ h = res->Item1;
 				array<float>^ probs = Softmax(res->Item2);
 
